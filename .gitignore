@@ -1,0 +1,30 @@
+# Credentials and environment-specific files
+*.env
+*.env.local
+
+# IDE and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+Thumbs.db
+
+# PHP/Composer
+vendor/
+composer.lock
+
+# Logs & cache
+*.log
+*.cache
+.cache/
+
+# Backup files
+*.bak
+*.orig
+backup_*/
+
+# Build artifacts
+dist/
+build/
+node_modules/
