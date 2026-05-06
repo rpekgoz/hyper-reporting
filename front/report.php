@@ -17,24 +17,25 @@ $entities = PluginHyperreportingDatasource::getEntityOptions();
 $techs    = PluginHyperreportingDatasource::getTechOptions();
 $cats     = PluginHyperreportingDatasource::getCategoryOptions();
 
-Html::header('Hyper Reporting', $_SERVER['PHP_SELF'], 'tools', 'PluginHyperreportingReport');
+Html::header('Hyper Reporting', $_SERVER['PHP_SELF'], 'tools', 'plugins');
 
-// CDN yüklemeleri
-echo <<<HTML
+$baseUrl  = Plugin::getWebDir('hyperreporting');
+$ajaxUrl  = $baseUrl . '/ajax/get_report_data.php';
+$xlsxUrl  = $baseUrl . '/ajax/export_xlsx.php';
+
+// CDN ve plugin CSS/JS — Html::header() sonrasinda inject
+echo '
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="' . $baseUrl . '/public/css/report.css">
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/tr.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" href="{$_SERVER['REQUEST_SCHEME']}://{$_SERVER['HTTP_HOST']}/plugins/hyperreporting/public/css/report.css">
-HTML;
-
-$baseUrl  = Plugin::getWebDir('hyperreporting');
-$ajaxUrl  = $baseUrl . '/ajax/get_report_data.php';
-$xlsxUrl  = $baseUrl . '/ajax/export_xlsx.php';
+';
 
 // Section & report menu yapısı
 $sections = [
