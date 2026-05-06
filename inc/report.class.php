@@ -37,33 +37,32 @@ class PluginHyperreportingReport extends CommonGLPI
 
     static function getAllowedEntityIds(): array
     {
-        if (Session::isAdmin() || Session::isSuperAdmin()) {
-            // Super-admin: tüm aktif entity'ler
-            global $DB;
+        global $DB;
+        // GLPI 11: Session::isSuperAdmin() veya yüksek profil kontrolü
+        if (Session::isSuperAdmin() || Session::haveRight('config', UPDATE)) {
             $rows = $DB->request(['SELECT' => ['id'], 'FROM' => 'glpi_entities']);
             return array_column(iterator_to_array($rows), 'id');
         }
-        // Normal kullanıcı: GLPI'nin profil bazlı entity listesi
-        return array_keys($_SESSION['glpiactiveentities'] ?? [0 => 0]);
+        // Normal kullanıcı: GLPI session'ından aktif entity listesi
+        $entities = array_keys($_SESSION['glpiactiveentities'] ?? []);
+        return !empty($entities) ? $entities : [0];
     }
 
     static function getAllowedTechIds(): array
     {
         global $DB;
-        $uid = Session::getLoginUserID();
+        $uid = (int) Session::getLoginUserID();
 
-        if (Session::isAdmin() || Session::isSuperAdmin()) {
-            // Tüm aktif teknisyenleri getir
+        if (Session::isSuperAdmin() || Session::haveRight('config', UPDATE)) {
             $rows = $DB->request([
-                'SELECT'     => ['DISTINCT glpi_tickets_users.users_id'],
-                'FROM'       => 'glpi_tickets_users',
-                'WHERE'      => ['type' => 2],
+                'SELECT'  => ['users_id'],
+                'FROM'    => 'glpi_tickets_users',
+                'WHERE'   => ['type' => 2],
+                'GROUPBY' => ['users_id'],
             ]);
             return array_column(iterator_to_array($rows), 'users_id');
         }
 
-        // Supervisor → kendi grubundaki userlar (basit: tüm teknisyenler)
-        // Technician → sadece kendisi
         return [$uid];
     }
 

@@ -463,11 +463,12 @@ class PluginHyperreportingDatasource
     {
         global $DB;
         $rows = $DB->request([
-            'SELECT'     => ['DISTINCT u.id', 'u.firstname', 'u.realname'],
-            'FROM'       => 'glpi_tickets_users AS tu',
-            'INNER JOIN' => ['glpi_users AS u' => ['ON' => ['u' => 'id', 'tu' => 'users_id']]],
-            'WHERE'      => ['tu.type' => 2, 'u.is_deleted' => 0, 'u.is_active' => 1],
-            'ORDER'      => 'u.realname ASC',
+            'SELECT'   => ['u.id', 'u.firstname', 'u.realname'],
+            'FROM'     => 'glpi_tickets_users AS tu',
+            'LEFT JOIN'=> ['glpi_users AS u' => ['ON' => ['u' => 'id', 'tu' => 'users_id']]],
+            'WHERE'    => ['tu.type' => 2, 'u.is_deleted' => 0, 'u.is_active' => 1],
+            'GROUPBY'  => ['u.id', 'u.firstname', 'u.realname'],
+            'ORDER'    => 'u.realname ASC',
         ]);
         return iterator_to_array($rows);
     }
