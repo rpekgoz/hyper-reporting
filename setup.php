@@ -17,14 +17,14 @@ function plugin_init_hyperreporting()
 
     $PLUGIN_HOOKS['csrf_compliant']['hyperreporting'] = true;
 
-    if (!Session::getLoginUserID()) {
-        return;
-    }
-
-    // Tools menüsüne ekle
+    // menu_toadd koşulsuz kayıt edilmeli — GLPI menüyü session öncesi build eder
     $PLUGIN_HOOKS['menu_toadd']['hyperreporting'] = [
         'tools' => 'PluginHyperreportingReport'
     ];
+
+    if (!Session::getLoginUserID()) {
+        return;
+    }
 
     Plugin::registerClass('PluginHyperreportingReport');
 

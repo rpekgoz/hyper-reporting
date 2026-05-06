@@ -28,8 +28,8 @@ class PluginHyperreportingReport extends CommonGLPI
         ];
     }
 
-    static function canCreate()   { return Session::haveRight('config', READ); }
-    static function canView()     { return Session::getLoginUserID() > 0; }
+    static function canCreate(): bool { return Session::haveRight('config', READ); }
+    static function canView(): bool   { return Session::getLoginUserID() > 0; }
 
     // -----------------------------------------------------------------------
     // RBAC — Kullanıcının görebileceği entity listesi
