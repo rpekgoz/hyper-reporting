@@ -130,7 +130,7 @@ foreach ($sections as $sk => $sv) {
           <select name="entity_ids[]" id="filter-entity" class="hr-select2" multiple>
             <?php foreach ($entities as $e): ?>
             <option value="<?= $e['id'] ?>" <?= in_array($e['id'],$filters['entity_ids'])?'selected':'' ?>>
-              <?= htmlspecialchars($e['completename']) ?>
+              <?= htmlspecialchars($e['name']) ?>
             </option>
             <?php endforeach; ?>
           </select>

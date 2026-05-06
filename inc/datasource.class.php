@@ -53,8 +53,7 @@ class PluginHyperreportingDatasource
     {
         global $DB;
         $where = self::buildWhere($f);
-        $where['t.status'] = [1, 2, 3, 4]; // New, Assigned, Planned, Waiting
-
+        $where['t.status'] = [1, 2, 3, 4];
         if (!empty($f['status'])) {
             $where['t.status'] = $f['status'];
         }
@@ -65,20 +64,21 @@ class PluginHyperreportingDatasource
                 't.time_to_resolve',
                 'e.name AS entity_name',
                 'ic.completename AS category_name',
-                'u.firstname AS tech_firstname', 'u.realname AS tech_realname',
-                'req.firstname AS req_firstname', 'req.realname AS req_realname',
+                new QueryExpression('MAX(CASE WHEN tu.type=2 THEN u.firstname END) AS tech_firstname'),
+                new QueryExpression('MAX(CASE WHEN tu.type=2 THEN u.realname  END) AS tech_realname'),
+                new QueryExpression('MAX(CASE WHEN tu.type=1 THEN u.firstname END) AS req_firstname'),
+                new QueryExpression('MAX(CASE WHEN tu.type=1 THEN u.realname  END) AS req_realname'),
                 new QueryExpression('TIMESTAMPDIFF(HOUR, t.date, NOW()) AS age_hours'),
             ],
             'FROM'      => 'glpi_tickets AS t',
             'LEFT JOIN' => [
-                'glpi_entities AS e'         => ['ON' => ['e' => 'id', 't' => 'entities_id']],
-                'glpi_itilcategories AS ic'  => ['ON' => ['ic' => 'id', 't' => 'itilcategories_id']],
-                'glpi_tickets_users AS tu'   => ['ON' => ['tu' => 'tickets_id', 't' => 'id', ['AND' => ['tu.type' => 2]]]],
-                'glpi_users AS u'            => ['ON' => ['u' => 'id', 'tu' => 'users_id']],
-                'glpi_tickets_users AS tureq'=> ['ON' => ['tureq' => 'tickets_id', 't' => 'id', ['AND' => ['tureq.type' => 1]]]],
-                'glpi_users AS req'          => ['ON' => ['req' => 'id', 'tureq' => 'users_id']],
+                'glpi_entities AS e'        => ['ON' => ['e'  => 'id', 't'  => 'entities_id']],
+                'glpi_itilcategories AS ic' => ['ON' => ['ic' => 'id', 't'  => 'itilcategories_id']],
+                'glpi_tickets_users AS tu'  => ['ON' => ['tu' => 'tickets_id', 't' => 'id']],
+                'glpi_users AS u'           => ['ON' => ['u'  => 'id', 'tu' => 'users_id']],
             ],
             'WHERE'     => $where,
+            'GROUPBY'   => ['t.id','t.name','t.date','t.status','t.priority','t.type','t.time_to_resolve','e.name','ic.completename'],
             'ORDER'     => 't.date DESC',
             'LIMIT'     => 500,
         ]);
@@ -168,11 +168,6 @@ class PluginHyperreportingDatasource
     // -----------------------------------------------------------------------
     public static function getWaitingTickets(array $f): array
     {
-        $f_waiting = $f;
-        $f_waiting['status'] = [4];
-        // Tarih filtresini kaldır — tüm bekleyenler görünsün
-        unset($f_waiting['date_start'], $f_waiting['date_end']);
-
         global $DB;
         $where = ['t.is_deleted' => 0, 't.status' => 4];
         $allowed = PluginHyperreportingReport::getAllowedEntityIds();
@@ -187,16 +182,18 @@ class PluginHyperreportingDatasource
             'SELECT'    => [
                 't.id', 't.name', 't.date', 't.begin_waiting_date', 't.priority',
                 'e.name AS entity_name',
-                'u.firstname AS tech_firstname', 'u.realname AS tech_realname',
+                new QueryExpression('MAX(CASE WHEN tu.type=2 THEN u.firstname END) AS tech_firstname'),
+                new QueryExpression('MAX(CASE WHEN tu.type=2 THEN u.realname  END) AS tech_realname'),
                 new QueryExpression('TIMESTAMPDIFF(HOUR, t.begin_waiting_date, NOW()) AS waiting_hours'),
             ],
             'FROM'      => 'glpi_tickets AS t',
             'LEFT JOIN' => [
-                'glpi_entities AS e'       => ['ON' => ['e' => 'id', 't' => 'entities_id']],
-                'glpi_tickets_users AS tu' => ['ON' => ['tu' => 'tickets_id', 't' => 'id', ['AND' => ['tu.type' => 2]]]],
-                'glpi_users AS u'          => ['ON' => ['u' => 'id', 'tu' => 'users_id']],
+                'glpi_entities AS e'       => ['ON' => ['e'  => 'id', 't'  => 'entities_id']],
+                'glpi_tickets_users AS tu' => ['ON' => ['tu' => 'tickets_id', 't' => 'id']],
+                'glpi_users AS u'          => ['ON' => ['u'  => 'id', 'tu' => 'users_id']],
             ],
             'WHERE'     => $where,
+            'GROUPBY'   => ['t.id','t.name','t.date','t.begin_waiting_date','t.priority','e.name'],
             'ORDER'     => 't.begin_waiting_date ASC',
         ]);
 
@@ -215,8 +212,8 @@ class PluginHyperreportingDatasource
             : $allowed;
 
         $where = [
-            't.is_deleted'       => 0,
-            't.status'           => [1, 2, 3, 4],
+            't.is_deleted' => 0,
+            't.status'     => [1, 2, 3, 4],
             new QueryExpression('t.time_to_resolve IS NOT NULL'),
         ];
         if (!empty($entities)) {
@@ -227,28 +224,30 @@ class PluginHyperreportingDatasource
             'SELECT'    => [
                 't.id', 't.name', 't.date', 't.time_to_resolve', 't.priority', 't.status',
                 'e.name AS entity_name',
-                'u.firstname AS tech_firstname', 'u.realname AS tech_realname',
                 'ic.completename AS category_name',
+                new QueryExpression('MAX(CASE WHEN tu.type=2 THEN u.firstname END) AS tech_firstname'),
+                new QueryExpression('MAX(CASE WHEN tu.type=2 THEN u.realname  END) AS tech_realname'),
                 new QueryExpression('TIMESTAMPDIFF(MINUTE, NOW(), t.time_to_resolve) AS minutes_remaining'),
             ],
             'FROM'      => 'glpi_tickets AS t',
             'LEFT JOIN' => [
-                'glpi_entities AS e'       => ['ON' => ['e' => 'id', 't' => 'entities_id']],
-                'glpi_tickets_users AS tu' => ['ON' => ['tu' => 'tickets_id', 't' => 'id', ['AND' => ['tu.type' => 2]]]],
-                'glpi_users AS u'          => ['ON' => ['u' => 'id', 'tu' => 'users_id']],
-                'glpi_itilcategories AS ic'=> ['ON' => ['ic' => 'id', 't' => 'itilcategories_id']],
+                'glpi_entities AS e'        => ['ON' => ['e'  => 'id', 't'  => 'entities_id']],
+                'glpi_itilcategories AS ic' => ['ON' => ['ic' => 'id', 't'  => 'itilcategories_id']],
+                'glpi_tickets_users AS tu'  => ['ON' => ['tu' => 'tickets_id', 't' => 'id']],
+                'glpi_users AS u'           => ['ON' => ['u'  => 'id', 'tu' => 'users_id']],
             ],
             'WHERE'     => $where,
+            'GROUPBY'   => ['t.id','t.name','t.date','t.time_to_resolve','t.priority','t.status','e.name','ic.completename'],
             'ORDER'     => 't.time_to_resolve ASC',
         ]);
 
         $rows = iterator_to_array($iterator);
         foreach ($rows as &$r) {
             $min = (int)$r['minutes_remaining'];
-            if ($min < 0)        $r['sla_status'] = 'breached';
-            elseif ($min < 60)   $r['sla_status'] = 'critical';
-            elseif ($min < 240)  $r['sla_status'] = 'warning';
-            else                 $r['sla_status'] = 'ok';
+            if ($min < 0)       $r['sla_status'] = 'breached';
+            elseif ($min < 60)  $r['sla_status'] = 'critical';
+            elseif ($min < 240) $r['sla_status'] = 'warning';
+            else                $r['sla_status'] = 'ok';
         }
         return $rows;
     }
@@ -451,10 +450,10 @@ class PluginHyperreportingDatasource
         global $DB;
         $allowed = PluginHyperreportingReport::getAllowedEntityIds();
         $rows = $DB->request([
-            'SELECT'  => ['id', 'name', 'completename'],
+            'SELECT'  => ['id', 'name'],
             'FROM'    => 'glpi_entities',
             'WHERE'   => ['id' => $allowed],
-            'ORDER'   => 'completename ASC',
+            'ORDER'   => 'name ASC',
         ]);
         return iterator_to_array($rows);
     }

@@ -267,3 +267,21 @@ table.dataTable tbody td { padding: 9px 12px !important; font-size: 13px !import
 ::-webkit-scrollbar-track { background: var(--hr-bg); }
 ::-webkit-scrollbar-thumb { background: var(--hr-border); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--hr-accent); }
+
+/* ---- GLPI CONTAINER RESET (white space fix) ---- */
+/* hr-wrap varken GLPI'nin kendi padding'ini sıfırla */
+body:has(.hr-wrap) #page.legacy {
+  padding: 0 !important;
+  background: #0f172a !important;
+}
+body:has(.hr-wrap) .page-body.container-fluid {
+  padding: 0 !important;
+  background: #0f172a !important;
+}
+body:has(.hr-wrap) .tab_cadre_central,
+body:has(.hr-wrap) .tab_cadre {
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}

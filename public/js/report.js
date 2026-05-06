@@ -17,8 +17,14 @@ let hrFilters  = window.HR_FILTERS || {};
    INIT
    ========================================================= */
 $(document).ready(function () {
+    // GLPI container white-space reset
+    $('.hr-wrap').closest('.page-body, .container-fluid, #page').css({
+        'background': '#0f172a',
+        'padding': '0'
+    });
+    $('#page.legacy').css({ 'padding': '0', 'background': '#0f172a' });
+
     initFilters();
-    initSidebar();
     initExportButton();
     loadReport(window.HR_REPORT, buildQueryParams());
 });
@@ -34,14 +40,18 @@ function initFilters() {
     flatpickr('#fp-start', fpOpts);
     flatpickr('#fp-end',   fpOpts);
 
-    // Select2 — entity, teknisyen, öncelik
-    ['#filter-entity', '#filter-tech', '#filter-priority'].forEach(sel => {
-        $(sel).select2({
-            placeholder: 'Tümü',
-            allowClear:  true,
-            width:       '200px',
-            dropdownAutoWidth: true,
-        });
+    // Select2 — entity, teknisyen, öncelik (ayrı placeholder'lar)
+    $('#filter-entity').select2({
+        placeholder: 'Tüm Müşteriler',
+        allowClear: true, width: '220px', dropdownAutoWidth: true,
+    });
+    $('#filter-tech').select2({
+        placeholder: 'Tüm Teknisyenler',
+        allowClear: true, width: '200px', dropdownAutoWidth: true,
+    });
+    $('#filter-priority').select2({
+        placeholder: 'Tüm Öncelikler',
+        allowClear: true, width: '180px', dropdownAutoWidth: true,
     });
 
     // Dönem değişince tarih aralığını göster/gizle ve doldur
@@ -104,18 +114,8 @@ function initFilters() {
     $('#filter-period').trigger('change');
 }
 
-/* =========================================================
-   SİDEBAR AKORDİYON
-   ========================================================= */
-function initSidebar() {
-    $('.hr-nav-section-title').on('click', function () {
-        const section = $(this).data('section');
-        if (!section) return; // coming-soon grupları
-        const $items = $(this).siblings('.hr-nav-items');
-        $items.toggleClass('open');
-        $(this).find('.hr-chevron').toggleClass('fa-chevron-down fa-chevron-up');
-    });
-}
+// initSidebar kaldırıldı — yatay nav kullanıyoruz
+
 
 /* =========================================================
    EXPORT BUTONU
