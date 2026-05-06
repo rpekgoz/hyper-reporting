@@ -174,6 +174,8 @@ function buildQueryParams() {
    RAPOR YÜKLE (AJAX)
    ========================================================= */
 function loadReport(reportKey, params) {
+    updateActiveFilterBadges();
+    $('#btn-apply').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Yükleniyor...');
     $('#hr-loading').show();
     $('#hr-error').addClass('hidden').text('');
     $('#hr-data-table').empty();
@@ -183,7 +185,7 @@ function loadReport(reportKey, params) {
     if (hrChart)  { hrChart.destroy(); hrChart = null; }
 
     params.set('report', reportKey);
-    const url = window.HR_AJAX + '?' + params.toString();
+    var url = HR_AJAX + '?' + params.toString();
 
     $.ajax({
         url:      url,
@@ -191,6 +193,7 @@ function loadReport(reportKey, params) {
         dataType: 'json',
         success:  function (data) {
             $('#hr-loading').hide();
+            $('#btn-apply').prop('disabled', false).html('<i class="fas fa-search"></i> Uygula');
             if (data.error) {
                 showError(data.error);
                 return;
@@ -200,11 +203,45 @@ function loadReport(reportKey, params) {
         },
         error: function (xhr) {
             $('#hr-loading').hide();
-            let msg = 'Sunucu hatası (' + xhr.status + ')';
-            try { const j = JSON.parse(xhr.responseText); msg = j.error || msg; } catch(e){}
+            $('#btn-apply').prop('disabled', false).html('<i class="fas fa-search"></i> Uygula');
+            var msg = 'Sunucu hatıası (' + xhr.status + ')';
+            try { var j = JSON.parse(xhr.responseText); msg = j.error || msg; } catch(e){}
             showError(msg);
         }
     });
+}
+
+function updateActiveFilterBadges() {
+    var badges = [];
+    var period = $('#filter-period option:selected').text();
+    if (period) badges.push('🗓️ ' + period);
+
+    var entities = $('#filter-entity').select2('data') || [];
+    entities.filter(function(d){ return d.id && d.id !== 'all'; }).forEach(function(d){
+        badges.push('🏢 ' + d.text);
+    });
+
+    var techs = $('#filter-tech').select2('data') || [];
+    techs.filter(function(d){ return d.id && d.id !== 'all'; }).forEach(function(d){
+        badges.push('👤 ' + d.text);
+    });
+
+    var prios = $('#filter-priority').select2('data') || [];
+    prios.filter(function(d){ return d.id && d.id !== 'all'; }).forEach(function(d){
+        badges.push('⚡ ' + d.text);
+    });
+
+    var $bar = $('#hr-active-filters');
+    if (badges.length === 0) {
+        $bar.html('<span style="color:var(--hr-muted);font-size:11px">Filtre uygulanmadı — tüm veriler görünüyor</span>');
+    } else {
+        var html = badges.map(function(b){
+            return '<span style="display:inline-flex;align-items:center;gap:4px;background:rgba(59,130,246,.15);' +
+                   'border:1px solid rgba(59,130,246,.3);color:#93c5fd;border-radius:6px;' +
+                   'padding:2px 10px;font-size:11px;font-weight:600">' + escHtml(b) + '</span>';
+        }).join('');
+        $bar.html(html);
+    }
 }
 
 /* =========================================================

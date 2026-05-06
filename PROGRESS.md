@@ -125,9 +125,9 @@ Kullan: 200 ile JSON error response
 ```bash
 # Tek komutla deploy
 cd local/hyper-reporting && tar czf /tmp/hr.tar.gz . && \
-scp /tmp/hr.tar.gz glpi@10.42.2.146:/tmp/ && \
-ssh glpi@10.42.2.146 "sudo tar xzf /tmp/hr.tar.gz -C /var/www/glpi/plugins/hyperreporting/ && \
-  sudo chown -R www-data:www-data /var/www/glpi/plugins/hyperreporting/ && \
+scp /tmp/hr.tar.gz [SSH_USER]@[DEV_SERVER_IP]:/tmp/ && \
+ssh [SSH_USER]@[DEV_SERVER_IP] "sudo tar xzf /tmp/hr.tar.gz -C [GLPI_PLUGINS_PATH]/hyperreporting/ && \
+  sudo chown -R www-data:www-data [GLPI_PLUGINS_PATH]/hyperreporting/ && \
   sudo systemctl reload php8.2-fpm"
 ```
 

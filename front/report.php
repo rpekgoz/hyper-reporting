@@ -165,11 +165,16 @@ foreach ($sections as $sk => $sv) {
           </select>
         </div>
         <div class="hr-filter-actions">
-          <button type="submit" class="hr-btn hr-btn-primary"><i class="fas fa-search"></i> Uygula</button>
+          <button type="submit" id="btn-apply" class="hr-btn hr-btn-primary"><i class="fas fa-search"></i> Uygula</button>
           <a href="?section=<?= $curSection ?>&report=<?= $curReport ?>" class="hr-btn hr-btn-ghost"><i class="fas fa-redo"></i></a>
         </div>
       </div>
     </form>
+
+    <!-- AKTİF FİLTRE BAR -->
+    <div id="hr-active-filters" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:24px;margin-bottom:12px;padding:4px 0">
+      <span style="color:var(--hr-muted);font-size:11px">Filtreler yükleniyor...</span>
+    </div>
 
     <!-- KPI -->
     <div class="hr-kpi-bar">
@@ -215,10 +220,10 @@ foreach ($sections as $sk => $sv) {
 </div><!-- /hr-wrap -->
 
 <script>
-const HR_AJAX = '<?= $ajaxUrl ?>';
-const HR_XLSX = '<?= $xlsxUrl ?>';
-const HR_REPORT  = '<?= $curReport ?>';
-const HR_FILTERS = <?= json_encode($filters, JSON_UNESCAPED_UNICODE) ?>;
+var HR_AJAX    = '<?= $ajaxUrl ?>';
+var HR_XLSX    = '<?= $xlsxUrl ?>';
+var HR_REPORT  = '<?= $curReport ?>';
+var HR_FILTERS = <?= json_encode($filters, JSON_UNESCAPED_UNICODE) ?>;
 </script>
 <script src="<?= $baseUrl ?>/public/js/report.js"></script>
 <?php Html::footer(); ?>
