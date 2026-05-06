@@ -128,7 +128,7 @@ foreach ($sections as $sk => $sv) {
         <div class="hr-filter-group">
           <label>Müşteri</label>
           <select name="entity_ids[]" id="filter-entity" class="hr-select2" multiple>
-            <option value="">— Tüm Müşteriler —</option>
+            <option value="all">— Tüm Müşteriler —</option>
             <?php foreach ($entities as $e): ?>
             <option value="<?= $e['id'] ?>" <?= in_array($e['id'],$filters['entity_ids'])?'selected':'' ?>>
               <?= htmlspecialchars($e['name']) ?>
@@ -139,7 +139,7 @@ foreach ($sections as $sk => $sv) {
         <div class="hr-filter-group">
           <label>Teknisyen</label>
           <select name="tech_ids[]" id="filter-tech" class="hr-select2" multiple>
-            <option value="">— Tüm Teknisyenler —</option>
+            <option value="all">— Tüm Teknisyenler —</option>
             <?php foreach ($techs as $t): ?>
             <option value="<?= $t['id'] ?>" <?= in_array($t['id'],$filters['tech_ids'])?'selected':'' ?>>
               <?= htmlspecialchars(trim($t['firstname'].' '.$t['realname'])) ?>
@@ -150,7 +150,7 @@ foreach ($sections as $sk => $sv) {
         <div class="hr-filter-group">
           <label>Öncelik</label>
           <select name="priority[]" id="filter-priority" class="hr-select2" multiple>
-            <option value="">— Tüm Öncelikler —</option>
+            <option value="all">— Tüm Öncelikler —</option>
             <?php foreach ([1=>'Çok Düşük',2=>'Düşük',3=>'Orta',4=>'Yüksek',5=>'Çok Yüksek',6=>'Kritik'] as $v=>$l): ?>
             <option value="<?= $v ?>" <?= in_array($v,$filters['priority'])?'selected':'' ?>><?= $l ?></option>
             <?php endforeach; ?>

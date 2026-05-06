@@ -9,9 +9,9 @@
 /* =========================================================
    GLOBALS
    ========================================================= */
-let hrChart    = null;
-let hrTable    = null;
-let hrFilters  = window.HR_FILTERS || {};
+if (typeof hrChart === 'undefined') var hrChart = null;
+if (typeof hrTable === 'undefined') var hrTable = null;
+var hrFilters = window.HR_FILTERS || {};
 
 /* =========================================================
    INIT
@@ -26,17 +26,17 @@ $(document).ready(function () {
 
     initFilters();
     initExportButton();
-    loadReport(window.HR_REPORT, buildQueryParams());
+    loadReport(window.HR_REPORT || 'open_tickets', buildQueryParams());
 });
 
 /* =========================================================
    FİLTRE BAŞLATMA
    ========================================================= */
 function initFilters() {
-    // Flatpickr — başlangıç ve bitiş tarihi
-    const fpOpts = { locale: 'tr', dateFormat: 'Y-m-d', allowInput: true,
-        disableMobile: true,
-        theme: 'dark' };
+    // Flatpickr — tarih seçici (locale güvenli)
+    var fpLocale = 'default';
+    try { if (flatpickr.l10ns && flatpickr.l10ns.tr) fpLocale = 'tr'; } catch(e){}
+    var fpOpts = { locale: fpLocale, dateFormat: 'Y-m-d', allowInput: true, disableMobile: true };
     flatpickr('#fp-start', fpOpts);
     flatpickr('#fp-end',   fpOpts);
 
@@ -54,13 +54,13 @@ function initFilters() {
         allowClear: true, width: '180px', dropdownAutoWidth: true,
     });
 
-    // "Tüm XX" seçilince diğerlerini temizle; spesifik seçilince "Tüm XX" kaldır
+    // "Tüm XX" (value='all') seçilince diğerlerini temizle
     ['#filter-entity','#filter-tech','#filter-priority'].forEach(function(sel) {
         $(sel).on('select2:select', function(e) {
-            if (e.params.data.id === '') {
-                $(this).val(['']).trigger('change');
+            if (e.params.data.id === 'all') {
+                $(this).val(['all']).trigger('change');
             } else {
-                var vals = ($(this).val() || []).filter(function(v){ return v !== ''; });
+                var vals = ($(this).val() || []).filter(function(v){ return v !== 'all'; });
                 $(this).val(vals).trigger('change');
             }
         });
@@ -158,10 +158,10 @@ function buildQueryParams() {
     if (endVal)   params.set('date_end',   endVal);
 
     // Entity multi
-    // Boş değer ("Tüm XX") filtreden dışla
-    ($('#filter-entity').val() || []).filter(function(v){ return v !== ''; }).forEach(function(v){ params.append('entity_ids[]', v); });
-    ($('#filter-tech').val() || []).filter(function(v){ return v !== ''; }).forEach(function(v){ params.append('tech_ids[]', v); });
-    ($('#filter-priority').val() || []).filter(function(v){ return v !== ''; }).forEach(function(v){ params.append('priority[]', v); });
+    // Boş değer ve 'all' değerini filtreden dışla
+    ($('#filter-entity').val() || []).filter(function(v){ return v !== '' && v !== 'all'; }).forEach(function(v){ params.append('entity_ids[]', v); });
+    ($('#filter-tech').val() || []).filter(function(v){ return v !== '' && v !== 'all'; }).forEach(function(v){ params.append('tech_ids[]', v); });
+    ($('#filter-priority').val() || []).filter(function(v){ return v !== '' && v !== 'all'; }).forEach(function(v){ params.append('priority[]', v); });
 
     // Tür
     const type = $('#filter-type').val();
