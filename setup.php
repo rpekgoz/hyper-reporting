@@ -1,11 +1,10 @@
 <?php
 /**
- * Hyper Reporting — GLPI Plugin
- * Enterprise-grade, multi-dimensional GLPI ticket & project reporting
+ * Hyper Reporting — setup.php
+ * GLPI Plugin kayıt ve başlatma
  *
  * @author  Raşit PEKGÖZ
  * @license GPLv2+
- * @link    https://github.com/rpekgoz/hyper-reporting
  */
 
 define('PLUGIN_HYPERREPORTING_VERSION', '0.1.0');
@@ -14,24 +13,41 @@ define('PLUGIN_HYPERREPORTING_MAX_GLPI', '11.0.99');
 
 function plugin_init_hyperreporting()
 {
-    global $PLUGIN_HOOKS;
+    global $PLUGIN_HOOKS, $CFG_GLPI;
+
     $PLUGIN_HOOKS['csrf_compliant']['hyperreporting'] = true;
 
-    if (Session::getLoginUserID()) {
-        // Sınıflar faz geliştirme sürecinde buraya eklenecek
-        // Plugin::registerClass('PluginHyperreportingReport');
+    if (!Session::getLoginUserID()) {
+        return;
+    }
+
+    // Tools menüsüne ekle
+    $PLUGIN_HOOKS['menu_toadd']['hyperreporting'] = [
+        'tools' => 'PluginHyperreportingReport'
+    ];
+
+    Plugin::registerClass('PluginHyperreportingReport');
+
+    // CSS & JS asset injection
+    if (strpos($_SERVER['REQUEST_URI'] ?? '', 'hyperreporting') !== false) {
+        $PLUGIN_HOOKS['add_css']['hyperreporting'] = [
+            'public/css/report.css'
+        ];
+        $PLUGIN_HOOKS['add_javascript']['hyperreporting'] = [
+            'public/js/report.js'
+        ];
     }
 }
 
 function plugin_version_hyperreporting()
 {
     return [
-        'name'           => 'Hyper Reporting',
-        'version'        => PLUGIN_HYPERREPORTING_VERSION,
-        'author'         => 'Raşit PEKGÖZ',
-        'license'        => 'GPLv2+',
-        'homepage'       => 'https://github.com/rpekgoz/hyper-reporting',
-        'requirements'   => [
+        'name'         => 'Hyper Reporting',
+        'version'      => PLUGIN_HYPERREPORTING_VERSION,
+        'author'       => 'Raşit PEKGÖZ',
+        'license'      => 'GPLv2+',
+        'homepage'     => 'https://github.com/rpekgoz/hyper-reporting',
+        'requirements' => [
             'glpi' => [
                 'min' => PLUGIN_HYPERREPORTING_MIN_GLPI,
                 'max' => PLUGIN_HYPERREPORTING_MAX_GLPI,
