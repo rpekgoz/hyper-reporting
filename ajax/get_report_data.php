@@ -100,8 +100,10 @@ try {
         default => ['error' => 'Bilinmeyen rapor: ' . htmlspecialchars($report)],
     };
 } catch (Throwable $e) {
-    http_response_code(500);
-    echo json_encode(['error' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
+    // NOT setting 500: GLPI intercepts 500 and replaces with {"error":true}
+    echo json_encode([
+        'error' => '[' . basename($e->getFile()) . ':' . $e->getLine() . '] ' . $e->getMessage(),
+    ], JSON_UNESCAPED_UNICODE);
     exit;
 }
 

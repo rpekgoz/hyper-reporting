@@ -54,6 +54,18 @@ function initFilters() {
         allowClear: true, width: '180px', dropdownAutoWidth: true,
     });
 
+    // "Tüm XX" seçilince diğerlerini temizle; spesifik seçilince "Tüm XX" kaldır
+    ['#filter-entity','#filter-tech','#filter-priority'].forEach(function(sel) {
+        $(sel).on('select2:select', function(e) {
+            if (e.params.data.id === '') {
+                $(this).val(['']).trigger('change');
+            } else {
+                var vals = ($(this).val() || []).filter(function(v){ return v !== ''; });
+                $(this).val(vals).trigger('change');
+            }
+        });
+    });
+
     // Dönem değişince tarih aralığını göster/gizle ve doldur
     $('#filter-period').on('change', function () {
         const val = $(this).val();
@@ -146,13 +158,10 @@ function buildQueryParams() {
     if (endVal)   params.set('date_end',   endVal);
 
     // Entity multi
-    ($('#filter-entity').val() || []).forEach(v => params.append('entity_ids[]', v));
-
-    // Tech multi
-    ($('#filter-tech').val() || []).forEach(v => params.append('tech_ids[]', v));
-
-    // Öncelik multi
-    ($('#filter-priority').val() || []).forEach(v => params.append('priority[]', v));
+    // Boş değer ("Tüm XX") filtreden dışla
+    ($('#filter-entity').val() || []).filter(function(v){ return v !== ''; }).forEach(function(v){ params.append('entity_ids[]', v); });
+    ($('#filter-tech').val() || []).filter(function(v){ return v !== ''; }).forEach(function(v){ params.append('tech_ids[]', v); });
+    ($('#filter-priority').val() || []).filter(function(v){ return v !== ''; }).forEach(function(v){ params.append('priority[]', v); });
 
     // Tür
     const type = $('#filter-type').val();
