@@ -295,7 +295,7 @@ class PluginHyperreportingDatasource
         global $DB;
         $where = self::buildWhere($f);
         $where['t.status'] = [5, 6];
-        $where[] = [new QueryExpression('t.solve_delay_stat > 0')];
+        $where[] = new QueryExpression('t.solve_delay_stat > 0');
 
         $iterator = $DB->request([
             'SELECT'    => [
@@ -326,7 +326,7 @@ class PluginHyperreportingDatasource
     {
         global $DB;
         $where = self::buildWhere($f);
-        $where[] = [new QueryExpression('t.takeintoaccount_delay_stat > 0')];
+        $where[] = new QueryExpression('t.takeintoaccount_delay_stat > 0');
 
         $iterator = $DB->request([
             'SELECT'    => [
@@ -417,13 +417,13 @@ class PluginHyperreportingDatasource
 
         // SLA uyumu
         $sla_base  = $base;
-        $sla_base[] = [new QueryExpression('t.time_to_resolve IS NOT NULL')];
-        $sla_base[] = ['t.status' => [5, 6]];
+        $sla_base[] = new QueryExpression('t.time_to_resolve IS NOT NULL');
+        $sla_base['t.status'] = [5, 6];
         $sla_total_r = iterator_to_array($DB->request(['COUNT' => 'id', 'FROM' => 'glpi_tickets AS t', 'WHERE' => $sla_base]));
         $sla_total   = (int)($sla_total_r[0]['COUNT'] ?? 0);
 
         $sla_ok_base  = $sla_base;
-        $sla_ok_base[] = [new QueryExpression('t.solvedate <= t.time_to_resolve')];
+        $sla_ok_base[] = new QueryExpression('t.solvedate <= t.time_to_resolve');
         $sla_ok_r      = iterator_to_array($DB->request(['COUNT' => 'id', 'FROM' => 'glpi_tickets AS t', 'WHERE' => $sla_ok_base]));
         $sla_ok        = (int)($sla_ok_r[0]['COUNT'] ?? 0);
         $sla_rate      = $sla_total > 0 ? round($sla_ok / $sla_total * 100, 1) : null;
