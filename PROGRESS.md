@@ -21,7 +21,7 @@
 ## ✅ FAZ 0 — Proje Kurulumu & Planlama (TAMAMLANDI)
 
 ### Yapılanlar
-- [x] mreporting plugin analizi (prod sunucudan incelendi)
+- [x] Mevcut GLPI raporlama altyapısı analiz edildi ve yetersizlikleri belgelendi
 - [x] GLPI veri modeli derinlemesine incelendi
   - [x] glpi_tickets tüm kolonları haritalandı
   - [x] Entity hiyerarşisi çıkarıldı (5 seviye)
@@ -114,7 +114,7 @@
 
 ### 2026-05-07 — Oturum #1
 - Proje planlandı ve onaylandı
-- mreporting analiz edildi, yetersizlikleri belgelendi
+- Mevcut GLPI raporlama altyapısı analiz edildi, yetersizlikleri belgelendi
 - GLPI prod veri modeli incelendi (gerçek verilerle)
 - 54+ rapor kataloğu oluşturuldu
 - Plugin iskelet hazırlandı

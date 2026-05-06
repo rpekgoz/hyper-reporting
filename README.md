@@ -1,7 +1,8 @@
 # Hyper Reporting — GLPI Plugin
 
 > **Enterprise-grade, çok boyutlu GLPI raporlama plugin'i.**
-> mreporting'in çok ötesinde — 54+ rapor, 10 bölüm, 6 paydaş profili, interaktif grafikler, PDF & Excel çıktısı.
+> 54+ rapor, 10 bölüm, 6 paydaş profili, interaktif grafikler, PDF & Excel çıktısı.
+> Modern arayüz, gerçek zamanlı filtreler, branded çıktılar.
 
 ---
 
