@@ -38,8 +38,9 @@ class PluginHyperreportingReport extends CommonGLPI
     static function getAllowedEntityIds(): array
     {
         global $DB;
-        // GLPI 11: Session::isSuperAdmin() veya yüksek profil kontrolü
-        if (Session::isSuperAdmin() || Session::haveRight('config', UPDATE)) {
+        // Admin/super-admin: tüm entity'lere erişim (GLPI 11 uyumlu kontrol)
+        $isAdmin = Session::haveRight('config', UPDATE);
+        if ($isAdmin) {
             $rows = $DB->request(['SELECT' => ['id'], 'FROM' => 'glpi_entities']);
             return array_column(iterator_to_array($rows), 'id');
         }
@@ -53,7 +54,7 @@ class PluginHyperreportingReport extends CommonGLPI
         global $DB;
         $uid = (int) Session::getLoginUserID();
 
-        if (Session::isSuperAdmin() || Session::haveRight('config', UPDATE)) {
+        if (Session::haveRight('config', UPDATE)) {
             $rows = $DB->request([
                 'SELECT'  => ['users_id'],
                 'FROM'    => 'glpi_tickets_users',
